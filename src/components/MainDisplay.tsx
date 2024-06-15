@@ -30,10 +30,10 @@ const MainDisplay = () => {
                 {MainPageData.map((data, index) => (
                     <CarouselItem key={index}>
                         <div className="p-1">
-                            <CardContent className="flex aspect-square items-center justify-center p-6 flex-col bg-gray-700 w-full rounded-lg">
-                                <p className="text-3xl font-bold mb-2">{data.name}</p>
-                                <p className="text-xl font-medium text-slate-300 mb-2">{data.title}</p>
-                                <p className="text-xl font-normal text-white mb-2 text-center">{data.quote}</p>
+                            <CardContent className="flex aspect-square items-center justify-center p-6 flex-col bg-gray-700 w-full rounded-lg m-auto">
+                                <p className="text-3xl font-bold mb-1">{data.name}</p>
+                                <p className="text-2xl font-medium text-slate-300 mb-3 text-center">{data.title}</p>
+                                <p className="text-lg font-normal text-white text-center">{data.quote}</p>
                             </CardContent>
                         </div>
                     </CarouselItem>

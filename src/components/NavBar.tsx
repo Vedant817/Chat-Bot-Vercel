@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 const NavBar = () => {
     return (
-        <nav className='p-4 md:p-6 shadow-md bg-zinc-800'>
+        <nav className='p-4 md:p-6 shadow-md bg-black'>
             <div className='container mx-auto flex flex-col md:flex-row justify-between items-center'>
             <a className='text-2xl font-bold mb-4 md:mb-0 text-white font-mono' href='/'>
                 <span>Chat Bot: {' '}</span>
