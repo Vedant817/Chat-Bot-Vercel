@@ -1,8 +1,8 @@
 import Image from "next/image";
-import NavBar from "@/compoments/NavBar";
-import Footer from "@/compoments/Footer";
-import Typewriter from "@/compoments/Typewriter";
-import MainDisplay from "@/compoments/MainDisplay";
+import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
+import Typewriter from "@/components/Typewriter";
+import MainDisplay from "@/components/MainDisplay";
 
 export default function Home() {
   return (
