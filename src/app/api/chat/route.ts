@@ -12,7 +12,25 @@ export async function POST(request: Request) {
         const response = result.response;
         const text = response.text();
 
-        return NextResponse.json({ text }, {status: 201});
+        //! Simulate a streaming response with a delay
+        let responseText = '';
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+            async start(controller) {
+                for (const word of text.split(' ')) {
+                    responseText += `${word} `;
+                    controller.enqueue(encoder.encode(`${word} `));
+                    await new Promise((resolve) => setTimeout(resolve, 200)); // Simulate delay
+                }
+                controller.close();
+            }
+        });
+
+        return new NextResponse(stream, {
+            headers: {
+                'Content-Type': 'text/plain'
+            }
+        });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'An error occurred while generating content.' }, { status: 500 });

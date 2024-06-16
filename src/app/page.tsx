@@ -1,9 +1,23 @@
+"use client"
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import Typewriter from "@/components/Typewriter";
 import MainDisplay from "@/components/MainDisplay";
+import { account } from "@/lib/appwrite";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter()
+  useEffect(()=>{
+    const checkSession = async () => {
+      const session = await account.get();
+      if(session){
+        router.push('/chat')
+      }
+    }
+    checkSession()
+  }, [])
   return (
     <>
       <NavBar />
