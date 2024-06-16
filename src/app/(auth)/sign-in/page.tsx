@@ -9,29 +9,27 @@ import { Form } from "@/components/ui/form"
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { SignUpSchema } from '@/schemas/SignUpSchema'
+import { SignInSchema } from '@/schemas/SignInSchema'
 import { account, ID } from "@/lib/appwrite";
 
-const SignUpPage = () => {
+const SignInPage = () => {
+    const [loggedInUser, setLoggedInUser] = useState(null)
     const router = useRouter()
-    const [username, setUsername] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
 
-    const signUp = async (data: z.infer<typeof SignUpSchema>) => {
+    const signIn = async (data: z.infer<typeof SignInSchema>) => {
         try {
-            const response = await account.create(ID.unique(), data.email, data.password, data.username)
-            console.log(response);
-            router.replace('/sign-in')
+            const session = await account.createEmailPasswordSession(data.email, data.password)
+            const loggedUser = await account.get()
+            setLoggedInUser(loggedUser)
+            router.replace('/chat')
         } catch (error) {
-            console.log(error);
+            console.log(error)
         }
     }
 
-    const form = useForm<z.infer<typeof SignUpSchema>>({
-        resolver: zodResolver(SignUpSchema),
+    const form = useForm<z.infer<typeof SignInSchema>>({
+        resolver: zodResolver(SignInSchema),
         defaultValues: {
-            username: "",
             email: "",
             password: ""
         }
@@ -42,23 +40,10 @@ const SignUpPage = () => {
             <div className="w-full max-w-md p-8 space-y-8 bg-gray-500 rounded-lg shadow-md">
                 <div className="text-center">
                     <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-                        Sign Up
+                        Login
                     </h1>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(signUp)} className="space-y-8">
-                            <FormField
-                                name="username"
-                                control={form.control}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Username" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        <form onSubmit={form.handleSubmit(signIn)} className="space-y-8">
                             <FormField
                                 name="email"
                                 control={form.control}
@@ -79,7 +64,7 @@ const SignUpPage = () => {
                                     <FormItem>
                                         <FormLabel>Password</FormLabel>
                                         <FormControl>
-                                            <Input type="password" placeholder="Password" {...field} />
+                                            <Input placeholder="Password" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -90,8 +75,8 @@ const SignUpPage = () => {
                     </Form>
                     <div className='text-center m-4'>
                         <p>
-                            Already a user? {' '}
-                            <Link href='/sign-in' className="text-blue-700 hover:text-blue-800 font-semibold">Sign In</Link>
+                            New User? {' '}
+                            <Link href='/sign-up' className="text-blue-700 hover:text-blue-800 font-semibold">SignUp</Link>
                         </p>
                     </div>
                 </div>
@@ -100,4 +85,4 @@ const SignUpPage = () => {
     )
 }
 
-export default SignUpPage
+export default SignInPage
