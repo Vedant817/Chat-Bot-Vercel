@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { account } from '@/lib/appwrite'
+import { account, database, ID } from '@/lib/appwrite'
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from 'zod'
 import { useForm } from "react-hook-form"
@@ -23,7 +23,10 @@ import NavBar from '@/components/NavBar'
 const ChatPage = () => {
   const router = useRouter()
   const [name, setName] = useState('')
+  const [userId, setUserId] = useState('')
   const [streamingText, setStreamingText] = useState('');
+  const [prompt, setPrompt] = useState('')
+  const [responseGenerated, setResponseGenerated] = useState('')
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -33,6 +36,7 @@ const ChatPage = () => {
           router.push('/sign-in');
         } else {
           setName(session.name);
+          setUserId(session.$id)
         }
       } catch (error) {
         console.error('Error fetching user session:', error);
@@ -51,13 +55,14 @@ const ChatPage = () => {
 
   async function onSubmit(values: z.infer<typeof PromptSchema>) {
     try {
+      setPrompt(values.prompt)
       setStreamingText('')
       const response = await fetch('/api/chat', {
         method: 'POST',
         body: JSON.stringify(values),
         headers: { 'Content-Type': 'application/json' },
       })
-      console.log(response);
+      console.log(response.body);
       if (response.body) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -68,6 +73,7 @@ const ChatPage = () => {
           done = readerDone;
           setStreamingText((prev) => prev + decoder.decode(value));
         }
+        setResponseGenerated(streamingText)
       } else {
         console.error('Response body is null');
       }
@@ -78,42 +84,64 @@ const ChatPage = () => {
     }
   }
 
+  async function saveDoc() {
+    try {
+      const result = await database.createDocument(
+        '666f3d2b00333918f75c',
+        '666f3d3800343b0f6912',
+        ID.unique(),
+        {
+          "userId": userId,
+          "prompt": prompt,
+          "response": responseGenerated
+        }
+      )
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   return (
     <>
-    <NavBar />
-    <div className='bg-black flex justify-center items-center min-h-screen flex-col mt-[-50px]'>
-      <h1 className='text-4xl font-semibold tracking-tight lg:text-5xl mb-6 text-white'>
-        <p className='mb-4'>Welcome {name} !! 👋</p>
-        <p className='text-center'>Lets Chat 💻</p>
-      </h1>
-      <div className='w-full max-w-xl p-8 space-y-8 bg-gray-500 rounded-lg shadow-md'>
-        <div className='text-center'>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                name="prompt"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-2xl'>Prompt</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your prompt" {...field} className='bg-gray-700 text-white border-gray-600' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">Submit</Button>
-            </form>
-          </Form>
-          {streamingText && (
-            <div className="mt-4 bg-gray-700 text-white p-4 rounded-lg shadow-md text-left whitespace-pre-wrap text-lg text-semibold">
-              {streamingText}
-            </div>
-          )}
+      <NavBar />
+      <div className='bg-black flex justify-center items-center min-h-screen flex-col'>
+        <h1 className='text-4xl font-semibold tracking-tight lg:text-5xl mb-6 text-white'>
+          <p className='mb-4'>Welcome {name} !! 👋</p>
+          <p className='text-center'>Lets Chat 💻</p>
+        </h1>
+        <div className='w-full max-w-xl p-8 space-y-8 bg-gray-500 rounded-lg shadow-md'>
+          <div className='text-center'>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                  name="prompt"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-2xl'>Prompt</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your prompt" {...field} className='bg-gray-700 text-white border-gray-600' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit">Submit</Button>
+              </form>
+            </Form>
+            {streamingText && (
+              <>
+                <div className="mt-4 mb-4 bg-gray-700 text-white p-4 rounded-lg shadow-md text-left whitespace-pre-wrap text-lg text-semibold">
+                  {streamingText}
+                </div>
+                <Button className='w-full md:w-auto text-white bg-green-600 hover:bg-green-800' onClick={saveDoc}>Save</Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </div>
     </>
   )
 }
