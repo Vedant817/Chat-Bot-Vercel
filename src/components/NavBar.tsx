@@ -22,9 +22,9 @@ const NavBar = () => {
                 </a>
                 {
                     session ? (
-                        <Link href='/savedChats'><Button className='w-full md:w-auto text-white bg-green-600 hover:bg-green-800 font-mono'>Save</Button></Link>
+                        <Link href='/savedChats'><Button className='w-full md:w-auto text-white bg-green-600 hover:bg-green-800 font-mono'>Go to Saved</Button></Link>
                     ) : (
-                        <Link href='/sign-in'><Button className='w-full md:w-auto text-white bg-green-600 hover:bg-green-800 font-mono'>Save</Button></Link>
+                        <Link href='/sign-in'><Button className='w-full md:w-auto text-white bg-green-600 hover:bg-green-800 font-mono'>SignIn</Button></Link>
                     )
                 }
             </div>
