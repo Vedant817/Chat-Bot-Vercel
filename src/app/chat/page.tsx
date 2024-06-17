@@ -61,26 +61,28 @@ const ChatPage = () => {
         method: 'POST',
         body: JSON.stringify(values),
         headers: { 'Content-Type': 'application/json' },
-      })
-      console.log(response.body);
+      });
       if (response.body) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let done = false;
-
+        let accumulatedText = '';
         while (!done) {
           const { value, done: readerDone } = await reader.read();
           done = readerDone;
-          setStreamingText((prev) => prev + decoder.decode(value));
+          if (value) {
+            accumulatedText += decoder.decode(value);
+            setStreamingText(accumulatedText);
+          }
         }
-        setResponseGenerated(streamingText)
+        setResponseGenerated(accumulatedText);
       } else {
         console.error('Response body is null');
       }
     } catch (error) {
-      console.error(error)
+      console.error('Error:', error);
     } finally {
-      form.reset() // Reset the form after submission
+      form.reset(); // Reset the form after submission
     }
   }
 
