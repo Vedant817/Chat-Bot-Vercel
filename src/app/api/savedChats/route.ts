@@ -2,7 +2,7 @@ import { account, database, ID } from "@/lib/appwrite";
 import { Query } from "appwrite";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
     try {
         const { userId } = await request.json()
         const chats = await database.listDocuments(
